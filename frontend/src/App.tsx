@@ -92,6 +92,12 @@ function App() {
   };
 
   const handleConfirmRules = async () => {
+    // Add user confirmation message
+    addMessage({
+      type: "user",
+      content: "Proceed with validation",
+    });
+
     if (pendingConfirmationId) {
       updateMessage(pendingConfirmationId, {
         content: "Rules confirmed ✓",

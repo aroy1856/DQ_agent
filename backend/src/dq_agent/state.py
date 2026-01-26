@@ -22,6 +22,7 @@ class DQState(TypedDict):
     dataframe_json: str  # JSON representation of DataFrame
     columns: list[str]
     dtypes: dict[str, str]
+    metadata: str  # User-provided column metadata/descriptions
 
     # Processing
     generated_code: str

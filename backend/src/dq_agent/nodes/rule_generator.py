@@ -15,20 +15,25 @@ Dataset Information:
 - Data types: {dtypes}
 - Sample data (first few rows): {sample_data}
 
+Column Metadata (user-provided descriptions):
+{column_metadata}
+
 User-provided rules (if any):
 {user_rules}
 
 Generate additional data quality rules that would be valuable for this dataset. Consider:
-1. Column name patterns (e.g., "email" → email format validation)
-2. Data types (e.g., numeric columns → range checks, null checks)
-3. Common data quality checks (uniqueness, completeness, format validation)
-4. Patterns visible in sample data
+1. Column metadata descriptions (if provided) - these describe what each column should contain
+2. Column name patterns (e.g., "email" → email format validation)
+3. Data types (e.g., numeric columns → range checks, null checks)
+4. Common data quality checks (uniqueness, completeness, format validation)
+5. Patterns visible in sample data
 
 IMPORTANT:
 - Do NOT duplicate any user-provided rules
 - Generate 3-5 NEW rules that complement the existing ones
 - Each rule should be a clear, actionable statement
 - Focus on rules that are likely to catch real data quality issues
+- Use the column metadata to generate more accurate rules
 
 Return ONLY a JSON array of rule strings, no explanations.
 Example format: ["Check that 'status' column only contains valid values", "Ensure 'date' column is in valid date format"]
@@ -61,6 +66,9 @@ def rule_generator_node(state: DQState) -> dict:
 
     # Prepare user rules text for prompt
     user_rules_text = "\n".join(f"- {r}" for r in user_rules) if user_rules else "None provided"
+    
+    # Get column metadata if provided
+    column_metadata = state.get("metadata", "") or "None provided"
 
     prompt = ChatPromptTemplate.from_template(RULE_GENERATION_PROMPT)
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
@@ -71,6 +79,7 @@ def rule_generator_node(state: DQState) -> dict:
             "columns": state["columns"],
             "dtypes": state["dtypes"],
             "sample_data": sample_data,
+            "column_metadata": column_metadata,
             "user_rules": user_rules_text,
         })
 

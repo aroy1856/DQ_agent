@@ -24,6 +24,8 @@ function App() {
   const [rulesFile, setRulesFile] = useState<File | null>(null);
   const [rulesText, setRulesText] = useState("");
   const [useTextRules, setUseTextRules] = useState(false);
+  const [metadata, setMetadata] = useState("");
+  const [metadataFile, setMetadataFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -73,7 +75,15 @@ function App() {
       content: `Run DQ check on ${csvFile.name}`,
     });
 
-    await runDQCheck(csvFile, rulesFile, rulesText, useTextRules, addMessage);
+    await runDQCheck(
+      csvFile,
+      rulesFile,
+      rulesText,
+      useTextRules,
+      metadata,
+      metadataFile,
+      addMessage,
+    );
   };
 
   const handleCancel = async () => {
@@ -188,6 +198,10 @@ function App() {
         setRulesText={setRulesText}
         useTextRules={useTextRules}
         setUseTextRules={setUseTextRules}
+        metadata={metadata}
+        setMetadata={setMetadata}
+        metadataFile={metadataFile}
+        setMetadataFile={setMetadataFile}
         isLoading={isLoading || phase === "waiting_confirmation"}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

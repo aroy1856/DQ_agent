@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 from src.dq_agent.nodes import (
     load_data_node,
     code_generator_node,
+    code_validator_node,
     code_executor_node,
     result_formatter_node,
     rule_generator_node,
@@ -121,6 +122,8 @@ async def load_rules(
     csv_file: UploadFile = File(...),
     rules_file: Optional[UploadFile] = File(None),
     rules: Optional[str] = Form(None),
+    metadata: Optional[str] = Form(None),
+    metadata_file: Optional[UploadFile] = File(None),
 ):
     """Load CSV and rules, generate AI suggestions, return all rules for review."""
     if thread_manager.get_thread(thread_id) is None:
@@ -153,6 +156,14 @@ async def load_rules(
                 tmp_rules.write("")
                 rules_path = tmp_rules.name
 
+        # Handle metadata (file takes precedence over text)
+        metadata_content = ""
+        if metadata_file:
+            metadata_bytes = await metadata_file.read()
+            metadata_content = metadata_bytes.decode("utf-8")
+        elif metadata:
+            metadata_content = metadata
+
         # Initialize state
         state = {
             "csv_path": csv_path,
@@ -162,6 +173,7 @@ async def load_rules(
             "dataframe_json": "",
             "columns": [],
             "dtypes": {},
+            "metadata": metadata_content,  # Column metadata for LLM
             "generated_code": "",
             "execution_results": [],
             "final_report": "",
@@ -245,6 +257,21 @@ async def confirm_rules(thread_id: str):
             state.update(result)
             
             yield f"event: code_generated\ndata: {json.dumps({'generated_code': state['generated_code']})}\n\n"
+
+            # Validate Code (AST + LLM review)
+            thread_manager.set_phase(thread_id, "validating")
+            yield f"event: status\ndata: {json.dumps({'step': 'code_validator', 'message': 'Validating generated code...'})}\n\n"
+            await asyncio.sleep(0)
+            
+            result = code_validator_node(state)
+            state.update(result)
+            
+            if not state.get("validation_passed", True):
+                validation_details = state.get("validation_details", {})
+                yield f"event: validation_failed\ndata: {json.dumps({'issues': validation_details})}\n\n"
+                # Continue anyway but log the issues
+            else:
+                yield f"event: code_validated\ndata: {json.dumps({'message': 'Code validation passed'})}\n\n"
 
             # Execute Code
             thread_manager.set_phase(thread_id, "executing")

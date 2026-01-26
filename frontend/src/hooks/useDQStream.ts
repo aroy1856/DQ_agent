@@ -25,6 +25,8 @@ export function useDQStream() {
       rulesFile: File | null,
       rulesText: string,
       useTextRules: boolean,
+      metadata: string,
+      metadataFile: File | null,
       addMessage: (msg: Omit<Message, "id" | "timestamp">) => string,
     ) => {
       setIsLoading(true);
@@ -50,6 +52,13 @@ export function useDQStream() {
           formData.append("rules", JSON.stringify(rules));
         } else if (rulesFile) {
           formData.append("rules_file", rulesFile);
+        }
+
+        // Add metadata (text or file)
+        if (metadataFile) {
+          formData.append("metadata_file", metadataFile);
+        } else if (metadata.trim()) {
+          formData.append("metadata", metadata.trim());
         }
         // If no rules provided, still continue - AI will generate suggestions
 

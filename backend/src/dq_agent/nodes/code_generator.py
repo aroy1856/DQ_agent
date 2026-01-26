@@ -10,6 +10,9 @@ Given the following information about a pandas DataFrame:
 - Data types: {dtypes}
 - Sample data (first few rows in JSON format): {sample_data}
 
+Column Metadata (descriptions of what each column should contain):
+{column_metadata}
+
 And the following data quality rules to validate:
 {rules}
 
@@ -27,6 +30,7 @@ Important guidelines:
 - For email validation, use a simple regex pattern
 - For numeric range checks, handle NaN values appropriately
 - Include the count of violations in the details
+- Use the column metadata to understand the expected format/values for each column
 
 Return ONLY the Python code, no explanations or markdown formatting.
 The code should be directly executable with exec().
@@ -63,6 +67,9 @@ def code_generator_node(state: DQState) -> dict:
     except Exception:
         sample_data = "[]"
 
+    # Get column metadata
+    column_metadata = state.get("metadata", "") or "None provided"
+
     prompt = ChatPromptTemplate.from_template(CODE_GENERATION_PROMPT)
 
     # Initialize LLM
@@ -76,6 +83,7 @@ def code_generator_node(state: DQState) -> dict:
                 "columns": state["columns"],
                 "dtypes": state["dtypes"],
                 "sample_data": sample_data,
+                "column_metadata": column_metadata,
                 "rules": rules_text,
             }
         )

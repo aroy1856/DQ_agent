@@ -1,0 +1,32 @@
+# Column Metadata for sample_data.csv
+# This file describes the expected format and constraints for each column
+
+id:
+  - Type: integer
+  - Description: Unique identifier for each record
+  - Constraints: Must be unique, cannot be null
+
+name:
+  - Type: string
+  - Description: Full name of the person
+  - Constraints: No leading/trailing whitespace, cannot be empty
+
+email:
+  - Type: string
+  - Description: Valid email address
+  - Constraints: Must follow standard email format (user@domain.tld)
+
+age:
+  - Type: integer
+  - Description: Age of the person in years
+  - Constraints: Must be between 0 and 120 (inclusive)
+
+amount:
+  - Type: decimal
+  - Description: Transaction amount in USD
+  - Constraints: Cannot be negative (>= 0)
+
+created_at:
+  - Type: date
+  - Description: Record creation date
+  - Format: YYYY-MM-DD

@@ -1,0 +1,5 @@
+Check that the 'email' column contains valid email formats
+Ensure 'age' column values are between 0 and 120
+Verify 'amount' column has no negative values
+Check for null or empty values in 'id' column
+Ensure 'name' column has no leading or trailing spaces

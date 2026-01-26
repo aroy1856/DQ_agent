@@ -76,7 +76,7 @@ export function RuleItem({
                     : "bg-purple-100 text-purple-600"
                 }`}
               >
-                {rule.source === "user" ? "👤 User" : "🤖 AI"}
+                {rule.source === "user" ? "User" : "AI"}
               </span>
             </div>
           </div>
@@ -87,14 +87,14 @@ export function RuleItem({
                 className="p-1.5 text-stone-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
                 title="Edit rule"
               >
-                ✏️
+                Edit
               </button>
               <button
                 onClick={() => onDelete(rule.id)}
                 className="p-1.5 text-stone-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
                 title="Delete rule"
               >
-                🗑️
+                Delete
               </button>
             </div>
           )}

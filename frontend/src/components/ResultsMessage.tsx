@@ -22,7 +22,7 @@ export function ResultsMessage({ message }: ResultsMessageProps) {
               }`}
             >
               <div className="flex items-start gap-2">
-                <span>{result.passed ? "✅" : "❌"}</span>
+                <span>{result.passed ? "PASS" : "FAIL"}</span>
                 <div>
                   <p className="text-sm font-medium text-stone-700">
                     {result.rule}

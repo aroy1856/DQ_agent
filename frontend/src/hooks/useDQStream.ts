@@ -91,7 +91,7 @@ export function useDQStream() {
         if (error instanceof Error) {
           addMessage({
             type: "system",
-            content: `❌ Error: ${error.message}`,
+            content: `Error: ${error.message}`,
           });
         }
       }
@@ -175,7 +175,7 @@ export function useDQStream() {
                     case "code_generated":
                       addMessage({
                         type: "code",
-                        content: "💻 Generated validation code:",
+                        content: "Generated validation code:",
                         data: { generatedCode: data.generated_code },
                       });
                       break;
@@ -183,7 +183,7 @@ export function useDQStream() {
                     case "code_executed":
                       addMessage({
                         type: "results",
-                        content: "📋 Execution results:",
+                        content: "Execution results:",
                         data: { results: data.execution_results },
                       });
                       break;
@@ -192,7 +192,7 @@ export function useDQStream() {
                       setPhase("complete");
                       addMessage({
                         type: "assistant",
-                        content: "✅ DQ Check Complete!",
+                        content: "DQ Check Complete!",
                         data: { summary: data.summary, errors: data.errors },
                       });
                       break;
@@ -200,7 +200,7 @@ export function useDQStream() {
                     case "error":
                       addMessage({
                         type: "system",
-                        content: `❌ Error: ${data.error}`,
+                        content: `Error: ${data.error}`,
                         data: { errors: [data.error] },
                       });
                       break;
@@ -218,7 +218,7 @@ export function useDQStream() {
         if (error instanceof Error && error.name !== "AbortError") {
           addMessage({
             type: "system",
-            content: `❌ Error: ${error.message}`,
+            content: `Error: ${error.message}`,
           });
         }
       } finally {

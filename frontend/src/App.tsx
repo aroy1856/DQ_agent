@@ -8,7 +8,7 @@ import {
   InputArea,
   RulesConfirmation,
 } from "./components";
-import { useDQStream } from "./hooks";
+import { useDQStream, useInputState } from "./hooks";
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([
@@ -16,16 +16,13 @@ function App() {
       id: "1",
       type: "assistant",
       content:
-        "Welcome to DQ Agent! Upload a CSV file and rules to validate your data quality. I'll also suggest additional rules based on your data.",
+        "Welcome to DQ Agent! Upload a CSV file and rules to validate your data quality. I will also suggest additional rules based on your data.",
       timestamp: new Date(),
     },
   ]);
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [rulesFile, setRulesFile] = useState<File | null>(null);
-  const [rulesText, setRulesText] = useState("");
-  const [useTextRules, setUseTextRules] = useState(false);
-  const [metadata, setMetadata] = useState("");
-  const [metadataFile, setMetadataFile] = useState<File | null>(null);
+
+  // Use reducer-based input state management
+  const { state: inputState, actions: inputActions } = useInputState();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -65,23 +62,23 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!csvFile) {
-      addMessage({ type: "system", content: "⚠️ Please select a CSV file" });
+    if (!inputState.csvFile) {
+      addMessage({ type: "system", content: "Please select a CSV file" });
       return;
     }
 
     addMessage({
       type: "user",
-      content: `Run DQ check on ${csvFile.name}`,
+      content: `Run DQ check on ${inputState.csvFile.name}`,
     });
 
     await runDQCheck(
-      csvFile,
-      rulesFile,
-      rulesText,
-      useTextRules,
-      metadata,
-      metadataFile,
+      inputState.csvFile,
+      inputState.rulesFile,
+      inputState.rulesText,
+      inputState.useTextRules,
+      inputState.metadata,
+      inputState.metadataFile,
       addMessage,
     );
   };
@@ -93,7 +90,6 @@ function App() {
 
   const handleRulesUpdate = (rules: Rule[]) => {
     updateRules(rules);
-    // Also update the message data locally
     if (pendingConfirmationId) {
       updateMessage(pendingConfirmationId, {
         data: { rules },
@@ -102,7 +98,6 @@ function App() {
   };
 
   const handleConfirmRules = async () => {
-    // Add user confirmation message
     addMessage({
       type: "user",
       content: "Proceed with validation",
@@ -110,7 +105,7 @@ function App() {
 
     if (pendingConfirmationId) {
       updateMessage(pendingConfirmationId, {
-        content: "Rules confirmed ✓",
+        content: "Rules confirmed",
       });
     }
     await confirmRules(addMessage);
@@ -190,18 +185,8 @@ function App() {
 
       {/* Input Area */}
       <InputArea
-        csvFile={csvFile}
-        setCsvFile={setCsvFile}
-        rulesFile={rulesFile}
-        setRulesFile={setRulesFile}
-        rulesText={rulesText}
-        setRulesText={setRulesText}
-        useTextRules={useTextRules}
-        setUseTextRules={setUseTextRules}
-        metadata={metadata}
-        setMetadata={setMetadata}
-        metadataFile={metadataFile}
-        setMetadataFile={setMetadataFile}
+        state={inputState}
+        actions={inputActions}
         isLoading={isLoading || phase === "waiting_confirmation"}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

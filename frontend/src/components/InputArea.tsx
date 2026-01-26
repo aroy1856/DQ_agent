@@ -1,36 +1,17 @@
 import { useState } from "react";
+import type { InputState, InputActions } from "../hooks";
 
 interface InputAreaProps {
-  csvFile: File | null;
-  setCsvFile: (file: File | null) => void;
-  rulesFile: File | null;
-  setRulesFile: (file: File | null) => void;
-  rulesText: string;
-  setRulesText: (text: string) => void;
-  useTextRules: boolean;
-  setUseTextRules: (use: boolean) => void;
-  metadata: string;
-  setMetadata: (text: string) => void;
-  metadataFile: File | null;
-  setMetadataFile: (file: File | null) => void;
+  state: InputState;
+  actions: InputActions;
   isLoading: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
 
 export function InputArea({
-  csvFile,
-  setCsvFile,
-  rulesFile,
-  setRulesFile,
-  rulesText,
-  setRulesText,
-  useTextRules,
-  setUseTextRules,
-  metadata,
-  setMetadata,
-  metadataFile,
-  setMetadataFile,
+  state,
+  actions,
   isLoading,
   onSubmit,
   onCancel,
@@ -49,13 +30,13 @@ export function InputArea({
               accept=".csv"
               id="csv-upload"
               className="hidden"
-              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+              onChange={(e) => actions.setCsvFile(e.target.files?.[0] || null)}
             />
             <label
               htmlFor="csv-upload"
               className="cursor-pointer px-4 py-2 rounded-lg bg-white border border-stone-300 hover:border-indigo-300 hover:bg-indigo-50 text-sm text-stone-700 transition-colors flex items-center gap-2 shadow-sm"
             >
-              📊 {csvFile ? csvFile.name : "Select CSV"}
+              {state.csvFile ? state.csvFile.name : "Select CSV"}
             </label>
           </div>
 
@@ -63,9 +44,9 @@ export function InputArea({
           <div className="flex items-center gap-1 bg-white rounded-lg p-1 border border-stone-300 shadow-sm">
             <button
               type="button"
-              onClick={() => setUseTextRules(false)}
+              onClick={() => actions.setUseTextRules(false)}
               className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
-                !useTextRules
+                !state.useTextRules
                   ? "bg-indigo-500 text-white"
                   : "text-stone-500 hover:text-stone-700"
               }`}
@@ -74,9 +55,9 @@ export function InputArea({
             </button>
             <button
               type="button"
-              onClick={() => setUseTextRules(true)}
+              onClick={() => actions.setUseTextRules(true)}
               className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
-                useTextRules
+                state.useTextRules
                   ? "bg-indigo-500 text-white"
                   : "text-stone-500 hover:text-stone-700"
               }`}
@@ -86,20 +67,22 @@ export function InputArea({
           </div>
 
           {/* Rules File Upload */}
-          {!useTextRules && (
+          {!state.useTextRules && (
             <div className="flex items-center gap-2">
               <input
                 type="file"
                 accept=".txt"
                 id="rules-upload"
                 className="hidden"
-                onChange={(e) => setRulesFile(e.target.files?.[0] || null)}
+                onChange={(e) =>
+                  actions.setRulesFile(e.target.files?.[0] || null)
+                }
               />
               <label
                 htmlFor="rules-upload"
                 className="cursor-pointer px-4 py-2 rounded-lg bg-white border border-stone-300 hover:border-indigo-300 hover:bg-indigo-50 text-sm text-stone-700 transition-colors flex items-center gap-2 shadow-sm"
               >
-                📝 {rulesFile ? rulesFile.name : "Select Rules"}
+                {state.rulesFile ? state.rulesFile.name : "Select Rules"}
               </label>
             </div>
           )}
@@ -109,20 +92,22 @@ export function InputArea({
             type="button"
             onClick={() => setShowMetadata(!showMetadata)}
             className={`px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm ${
-              showMetadata || metadata || metadataFile
+              showMetadata || state.metadata || state.metadataFile
                 ? "bg-emerald-50 border border-emerald-300 text-emerald-700"
                 : "bg-white border border-stone-300 text-stone-700 hover:border-emerald-300 hover:bg-emerald-50"
             }`}
           >
-            📋 {metadata || metadataFile ? "Metadata ✓" : "Add Metadata"}
+            {state.metadata || state.metadataFile
+              ? "Metadata Added"
+              : "Add Metadata"}
           </button>
         </div>
 
         {/* Text Rules Input */}
-        {useTextRules && (
+        {state.useTextRules && (
           <textarea
-            value={rulesText}
-            onChange={(e) => setRulesText(e.target.value)}
+            value={state.rulesText}
+            onChange={(e) => actions.setRulesText(e.target.value)}
             rows={2}
             placeholder="Enter rules (one per line)..."
             className="w-full mb-3 px-4 py-2 rounded-lg bg-white border border-stone-300 text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none shadow-sm"
@@ -163,8 +148,8 @@ export function InputArea({
             </div>
             {useMetadataText ? (
               <textarea
-                value={metadata}
-                onChange={(e) => setMetadata(e.target.value)}
+                value={state.metadata}
+                onChange={(e) => actions.setMetadata(e.target.value)}
                 rows={3}
                 placeholder={`Describe your columns, e.g.:
 - id: unique identifier, should never be null
@@ -181,21 +166,25 @@ export function InputArea({
                   accept=".txt,.md"
                   id="metadata-upload"
                   className="hidden"
-                  onChange={(e) => setMetadataFile(e.target.files?.[0] || null)}
+                  onChange={(e) =>
+                    actions.setMetadataFile(e.target.files?.[0] || null)
+                  }
                 />
                 <label
                   htmlFor="metadata-upload"
                   className="cursor-pointer px-4 py-2 rounded-lg bg-white border border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50 text-sm text-stone-700 transition-colors flex items-center gap-2 shadow-sm"
                 >
-                  📋 {metadataFile ? metadataFile.name : "Select Metadata File"}
+                  {state.metadataFile
+                    ? state.metadataFile.name
+                    : "Select Metadata File"}
                 </label>
-                {metadataFile && (
+                {state.metadataFile && (
                   <button
                     type="button"
-                    onClick={() => setMetadataFile(null)}
+                    onClick={() => actions.setMetadataFile(null)}
                     className="text-stone-400 hover:text-rose-500"
                   >
-                    ✕
+                    ×
                   </button>
                 )}
               </div>
@@ -210,7 +199,7 @@ export function InputArea({
             disabled={isLoading}
             className="flex-1 py-3 rounded-xl font-medium text-white bg-linear-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
           >
-            {isLoading ? "⏳ Processing..." : "🚀 Run DQ Check"}
+            {isLoading ? "Processing..." : "Run DQ Check"}
           </button>
           {isLoading && (
             <button

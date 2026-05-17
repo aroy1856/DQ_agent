@@ -89,6 +89,12 @@ The system analyzes your dataset and suggests relevant rules based on:
 
 Click "Proceed" to generate validation code and execute checks. Results are streamed in real-time.
 
+## 📚 Learning Guide
+
+For a step-by-step backend build walkthrough with deeper GenAI concepts, see:
+
+- [Backend and GenAI Build Guide](docs/backend-genai-guide.md)
+
 ## 🏗️ Architecture
 
 ```
